@@ -1,5 +1,6 @@
-from selenium_driver import webdriver
-from book import Publisher
+import sys
+
+from models.book import Publisher
 
 
 class PublisherScrapper(object):
@@ -9,7 +10,7 @@ class PublisherScrapper(object):
 
     def extract_publishers(self):
         self.driver.get(self.url)
-
+        sys.stdout.write('extracting publishers started')
         publishers_body = self.driver.find_element_by_tag_name("article")
         publishers_link = publishers_body.find_elements_by_xpath(".//a[@href]")
         publishers = []
@@ -18,4 +19,6 @@ class PublisherScrapper(object):
             publisher.name = link.text
             publisher.link = link.get_attribute("href")
             publishers.append(publisher)
+            print(publisher.name)
+        sys.stdout.write('extracting publishers finished')
         return publishers
