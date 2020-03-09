@@ -1,6 +1,6 @@
 import sys
 
-from models.book import Publisher
+from bookcrawler.models.model import Publisher
 
 
 class PublisherScrapper(object):
@@ -8,7 +8,7 @@ class PublisherScrapper(object):
         self.driver = driver
         self.url = url
 
-    def extract_publishers(self):
+    def extract_publishers_by_web(self):
         self.driver.get(self.url)
         sys.stdout.write('extracting publishers started')
         publishers_body = self.driver.find_element_by_tag_name("article")

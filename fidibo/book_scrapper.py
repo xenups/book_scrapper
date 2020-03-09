@@ -2,7 +2,7 @@
 import sys
 
 from unidecode import unidecode
-from models.book import Book
+from bookcrawler.models.model import Book
 
 
 class BookScrapper(object):
@@ -11,7 +11,7 @@ class BookScrapper(object):
         self.url = url
         self.publisher = publisher_name
 
-    def extract_books(self):
+    def extract_books_by_web(self):
         pages_count = self.__extract_pages_count(url=self.url)
         list_books = []
 
@@ -40,7 +40,7 @@ class BookScrapper(object):
             numbers = []
             for item in pages_list:
                 for subitem in item.split():
-                    if (subitem.isdigit()):
+                    if subitem.isdigit():
                         numbers.append(subitem)
             numbers = list(map(int, numbers))
             return numbers[-1]
