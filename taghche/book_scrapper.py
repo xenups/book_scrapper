@@ -1,5 +1,6 @@
 ﻿import json
 import os
+import sys
 import time
 from time import sleep
 
@@ -12,10 +13,11 @@ from bookcrawler.file_handler.csv_handler import export_book_to_csv
 from bookcrawler.models.model import Book
 from taghche.models.model import Pagination
 
+sys.setrecursionlimit(1000000000)
 JSON_FILE_PATH = "./taghche/data/taghche.json"
 TEMPLATE_URL = "https://get.taaghche.com/v2/everything?filters={%22list%22:[{%22value%22:31,%22type%22:1},{%22type%22:3,%22value%22:-106},{%22type%22:21,%22value%22:0},{%22type%22:50,%22value%22:0}],%22refId%22:%22ff27bfa7-2166-46bf-9b2f-221ab9f18e7d.1%22}&offset=0-0-0-15&order=7"
 HOST = "https://get.taaghche.com/v2/everything"
-INITIAL_OFFSET = "0-0-0-5000"
+INITIAL_OFFSET = "0-0-0-100"
 
 
 class BookScrapper(object):
@@ -60,6 +62,7 @@ class BookScrapper(object):
                 book_instance.price = book["price"]
                 book_instance.publisher = book["publisher"]
                 book_instance.author = self.convert_authors_to_string(book["authors"])
+                book_instance.category = self.convert_categories_to_string(book["categories"])
                 # book_instance.beforeOffPrice = book["beforeOffPrice"]
                 # book_instance.rating = book["rating"]
                 # book_instance.physicalPrice = book["PhysicalPrice"]
@@ -76,13 +79,28 @@ class BookScrapper(object):
         return authors_name
 
     @staticmethod
-    def __get_next_offset_from_json():
+    def convert_categories_to_string(list_categories):
+        category_name = " "
+        for category_index in range(list_categories.__len__()):
+            category = list_categories[category_index]
+            category_name = category_name + str(category["title"]) + " "
+        return category_name
+
+    @staticmethod
+    def change_offset_lentgh(offset, length=20):
+        _custom_offset = offset.split('-')
+        _custom_offset[-1] = str(length)
+        _offset = '-'.join(_custom_offset)
+        print(_offset)
+        return _offset
+
+    def __get_next_offset_from_json(self, ):
         try:
             with open(JSON_FILE_PATH, encoding='utf-8-sig') as input_file:
                 json_object = json.load(input_file)
                 pagination = Pagination()
                 pagination.hasMore = json_object["hasMore"]
-                pagination.offset = json_object["nextOffset"]
+                pagination.offset = self.change_offset_lentgh(json_object["nextOffset"], 1000)
                 return pagination
         except Exception as error:
             pagination = Pagination()

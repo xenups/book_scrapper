@@ -29,4 +29,4 @@ class Fidibo(BookStore):
 
 class Taghche(BookStore):
     def scrape(self):
-        TaghcheScrapper(category_id=31).extract_books()
+        TaghcheScrapper(category_id=1).extract_books()
