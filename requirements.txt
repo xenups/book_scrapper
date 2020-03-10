@@ -4,8 +4,12 @@ chardet==3.0.4
 colorama==0.4.3
 configparser==4.0.2
 crayons==0.3.0
+furl==2.1.0
 idna==2.9
+ijson==2.6.1
+jsonslicer==0.1.5
 numpy==1.18.1
+orderedmultidict==1.0.1
 pandas==1.0.1
 python-dateutil==2.8.1
 pytz==2019.3
