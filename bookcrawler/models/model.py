@@ -1,7 +1,13 @@
+class Category(object):
+    def __init__(self):
+        self.url = None
+        self.title = None
+
+
 class Publisher(object):
     def __init__(self):
         self.name = None
-        self.link = None
+        self.url = None
 
 
 class Book(object):

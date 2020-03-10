@@ -1,22 +1,43 @@
 ﻿# -*- coding: UTF-8 -*-
 import sys
-
 from unidecode import unidecode
-from bookcrawler.models.model import Book
+
+from bookcrawler.file_handler.csv_handler import export_book_to_csv
+from bookcrawler.models.model import Book, Publisher
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 class BookScrapper(object):
-    def __init__(self, url, publisher_name, driver):
+    def __init__(self, driver: WebDriver):
         self.driver = driver
-        self.url = url
-        self.publisher = publisher_name
 
-    def extract_books_by_web(self):
-        pages_count = self.__extract_pages_count(url=self.url)
+    def extract_books_by_publishers(self, url):
+        publishers = self.__extract_publishers(url)
+        for publisher in publishers:
+            books = self.__scrape_books_by_publishers(publisher)
+            export_book_to_csv(books=books)
+
+    def __extract_publishers(self, url):
+        self.driver.get(url)
+        sys.stdout.write('extracting publishers started')
+        publishers_body = self.driver.find_element_by_tag_name("article")
+        publishers_link = publishers_body.find_elements_by_xpath(".//a[@href]")
+        publishers = []
+        for link in publishers_link:
+            publisher = Publisher()
+            publisher.name = link.text
+            publisher.url = link.get_attribute("href")
+            publishers.append(publisher)
+            print(publisher.name)
+        sys.stdout.write('extracting publishers finished')
+        return publishers
+
+    def __scrape_books_by_publishers(self, publisher):
+        pages_count = self.__extract_pages_count(url=publisher.url)
         list_books = []
 
         for page_number in range(1, pages_count + 1):
-            page_url = self.url + "?page=" + str(page_number)
+            page_url = publisher.url + "?page=" + str(page_number)
             self.driver.get(page_url)
             books = self.driver.find_elements_by_class_name("book")
             sys.stdout.write('extracting book started')
@@ -24,7 +45,7 @@ class BookScrapper(object):
                 book_instance = Book()
                 book_instance.title = book.find_element_by_class_name("title").text
                 book_instance.author = book.find_element_by_class_name("author").text
-                book_instance.publisher = self.publisher
+                book_instance.publisher = publisher.name
                 list_books.append(book_instance)
                 print(book_instance.title)
             sys.stdout.write('extracting book finished')

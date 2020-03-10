@@ -27,13 +27,13 @@ class BookScrapper(object):
         self.__remove_json_file()
         self.url = self.__generate_url_by_category(category_id=category_id, offset=INITIAL_OFFSET)
 
-    def extract_books(self):
+    def extract_books_by_category(self):
         export_book_to_csv(self.__get_books_from_api(self.url))
         __pagination = self.__get_next_offset_from_json()
 
         if __pagination.hasMore:
             self.url = self.__generate_url_by_category(self.category_id, offset=__pagination.offset)
-            self.extract_books()
+            self.extract_books_by_category()
 
     @staticmethod
     def __generate_url_by_category(category_id, offset):

@@ -1,12 +1,10 @@
-﻿from fidibo.book_scrapper import BookScrapper
-from fidibo.publisher_scrapper import PublisherScrapper
-
-from bookcrawler.file_handler.csv_handler import export_book_to_csv
-from bookcrawler.selenium_driver import ChromeDriverManager
+﻿from abc import ABC
+from fidibo.book_scrapper import BookScrapper as FidiboScrapper
 from bookcrawler.selenium_driver import webdriver
-from abc import ABC
-
+from bookcrawler.selenium_driver import ChromeDriverManager
 from taghche.book_scrapper import BookScrapper as TaghcheScrapper
+from ketabrah.book_scrapper import BookScrapper as KetabrahScrapper
+from bookcrawler.file_handler.csv_handler import export_book_to_csv
 
 
 class BookStore(ABC):
@@ -17,16 +15,17 @@ class BookStore(ABC):
 class Fidibo(BookStore):
     def scrape(self):
         web_driver = webdriver.Chrome(ChromeDriverManager().install())
-        print("hi2")
         url = "https://fidibo.com/books/publisher"
-        publishers = PublisherScrapper(url=url, driver=web_driver).extract_publishers_by_web()
-
-        for publisher in publishers:
-            books = BookScrapper(url=publisher.link, publisher_name=publisher.name,
-                                 driver=web_driver).extract_books_by_web()
-            export_book_to_csv(books=books)
+        publishers = FidiboScrapper(driver=web_driver).extract_books_by_publishers(url=url)
 
 
 class Taghche(BookStore):
     def scrape(self):
-        TaghcheScrapper(category_id=1).extract_books()
+        TaghcheScrapper(category_id=1).extract_books_by_category()
+
+
+class Ketabrah(BookStore):
+    def scrape(self):
+        url = "https://www.ketabrah.ir/book-category/%DA%A9%D8%AA%D8%A7%D8%A8%E2%80%8C%D9%87%D8%A7%DB%8C-%D8%AD%D9%82%D9%88%D9%82/"
+        web_driver = webdriver.Chrome(ChromeDriverManager().install())
+        KetabrahScrapper(url=url, driver=web_driver).extract_by_publishers()

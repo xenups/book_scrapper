@@ -1,5 +1,6 @@
-from bookstore_handler import Fidibo, Taghche
+from bookstore_handler import Fidibo, Taghche, Ketabrah
 
 if __name__ == '__main__':
-    # Fidibo().scrape()
-    Taghche().scrape()
+    Fidibo().scrape()
+    # Taghche().scrape()
+    # Ketabrah().scrape()
