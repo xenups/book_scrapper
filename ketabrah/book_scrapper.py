@@ -8,12 +8,12 @@ class BookScrapper(object):
     def __init__(self, driver: WebDriver):
         self.driver = driver
 
-    def extract_by_category(self, category_url):
+    def extract_books_by_category(self, category_url):
         categories = self.__scrape_categories_link(category_url=category_url)
         for category in categories:
             export_book_to_csv(self.__scrape_books_by_category(category))
 
-    def extract_by_publishers(self, publishers_url):
+    def extract_books_by_publishers(self, publishers_url):
         publishers = self.__scrape_publishers_link(publishers_url=publishers_url)
         for publisher in publishers:
             export_book_to_csv(self.__scrape_books_by_publishers(publisher))
