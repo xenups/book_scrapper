@@ -1,4 +1,5 @@
 ﻿# -*- coding: UTF-8 -*-
+import logging
 import sys
 from unidecode import unidecode
 
@@ -19,7 +20,7 @@ class BookScrapper(object):
 
     def __extract_publishers(self, publishers_url):
         self.driver.get(publishers_url)
-        sys.stdout.write('extracting publishers started')
+        logging.info('extracting publishers started')
         publishers_body = self.driver.find_element_by_tag_name("article")
         publishers_link = publishers_body.find_elements_by_xpath(".//a[@href]")
         publishers = []
@@ -28,8 +29,9 @@ class BookScrapper(object):
             publisher.name = link.text
             publisher.url = link.get_attribute("href")
             publishers.append(publisher)
-            print(publisher.name)
-        sys.stdout.write('extracting publishers finished')
+            logging.info(publisher.name)
+
+        logging.info('extracting publishers finished')
         return publishers
 
     def __scrape_books_by_publishers(self, publisher):
@@ -40,15 +42,15 @@ class BookScrapper(object):
             page_url = publisher.url + "?page=" + str(page_number)
             self.driver.get(page_url)
             books = self.driver.find_elements_by_class_name("book")
-            sys.stdout.write('extracting book started')
+            logging.info('extracting publishers started')
             for book in books:
                 book_instance = Book()
                 book_instance.title = book.find_element_by_class_name("title").text
                 book_instance.author = book.find_element_by_class_name("author").text
                 book_instance.publisher = publisher.name
                 list_books.append(book_instance)
-                print(book_instance.title)
-            sys.stdout.write('extracting book finished')
+                logging.info(book_instance.title)
+            logging.info('extracting publishers finished')
         return list_books
 
     def __extract_pages_count(self, url):
