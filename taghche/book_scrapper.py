@@ -11,12 +11,16 @@ from bookcrawler.file_handler.csv_handler import export_book_to_csv
 JSON_FILE_PATH = "./taghche/data/taghche.json"
 TEMPLATE_URL = "https://get.taaghche.com/v2/everything?filters={%22list%22:[{%22value%22:31,%22type%22:1},{%22type%22:3,%22value%22:-106},{%22type%22:21,%22value%22:0},{%22type%22:50,%22value%22:0}],%22refId%22:%22ff27bfa7-2166-46bf-9b2f-221ab9f18e7d.1%22}&offset=0-0-0-15&order=7"
 HOST = "https://get.taaghche.com/v2/everything"
-INITIAL_OFFSET = "0-0-0-100"
+
+
+# INITIAL_OFFSET = "0-0-0-100"
 
 
 class BookScrapper(object):
     def __init__(self):
         self.__remove_json_file()
+        self.response_count = 100
+        self.INITIAL_OFFSET = "0-0-0-100"
 
     def extract_books_api_by_category(self, category_id):
         __pagination = self.__get_next_offset_from_json()
@@ -27,6 +31,10 @@ class BookScrapper(object):
                 __pagination = self.__get_next_offset_from_json()
             else:
                 break
+
+    def set_response_count(self, count: int):
+        self.INITIAL_OFFSET = "0-0-0-" + str(count)
+        self.response_count = count
 
     @staticmethod
     def __generate_url_pagination_by_category(category_id, offset):
@@ -92,12 +100,12 @@ class BookScrapper(object):
                 json_object = json.load(input_file)
                 pagination = Pagination()
                 pagination.hasMore = json_object["hasMore"]
-                pagination.offset = self.change_offset_lentgh(json_object["nextOffset"], 100)
+                pagination.offset = self.change_offset_lentgh(json_object["nextOffset"], self.response_count)
                 return pagination
         except Exception as error:
             pagination = Pagination()
             pagination.hasMore = True
-            pagination.offset = INITIAL_OFFSET
+            pagination.offset = self.INITIAL_OFFSET
             return pagination
 
     @staticmethod
