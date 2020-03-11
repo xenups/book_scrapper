@@ -11,14 +11,14 @@ class BookScrapper(object):
     def __init__(self, driver: WebDriver):
         self.driver = driver
 
-    def extract_books_by_publishers(self, url):
-        publishers = self.__extract_publishers(url)
+    def extract_books_by_publishers(self, publishers_url):
+        publishers = self.__extract_publishers(publishers_url)
         for publisher in publishers:
             books = self.__scrape_books_by_publishers(publisher)
             export_book_to_csv(books=books)
 
-    def __extract_publishers(self, url):
-        self.driver.get(url)
+    def __extract_publishers(self, publishers_url):
+        self.driver.get(publishers_url)
         sys.stdout.write('extracting publishers started')
         publishers_body = self.driver.find_element_by_tag_name("article")
         publishers_link = publishers_body.find_elements_by_xpath(".//a[@href]")

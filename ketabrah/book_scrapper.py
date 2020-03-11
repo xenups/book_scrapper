@@ -5,19 +5,16 @@ from bookcrawler.file_handler.csv_handler import export_book_to_csv
 
 
 class BookScrapper(object):
-    def __init__(self, url, driver: WebDriver):
+    def __init__(self, driver: WebDriver):
         self.driver = driver
-        self.url = url
 
-    def extract_by_category(self):
-        categories = self.__scrape_categories_link()
-        print(categories)
+    def extract_by_category(self, category_url):
+        categories = self.__scrape_categories_link(category_url=category_url)
         for category in categories:
             export_book_to_csv(self.__scrape_books_by_category(category))
 
-    def extract_by_publishers(self):
-        publishers = self.__scrape_publishers_link()
-        print(publishers)
+    def extract_by_publishers(self, publishers_url):
+        publishers = self.__scrape_publishers_link(publishers_url=publishers_url)
         for publisher in publishers:
             export_book_to_csv(self.__scrape_books_by_publishers(publisher))
 
@@ -50,23 +47,22 @@ class BookScrapper(object):
         _url = url + "/page-" + str(page_index)
         return _url
 
-    def __scrape_categories_link(self):
+    def __scrape_categories_link(self, category_url):
         categories = []
-        self.driver.get(self.url)
+        self.driver.get(url=category_url)
         menu_items = self.driver.find_element_by_class_name("cr-menu")
         items = menu_items.find_elements_by_class_name("crm-item")
         for item in items:
-            url = item.find_element_by_xpath(".//a[@href]").get_attribute("href")
-            if "book-category" in url:
+            category_url = item.find_element_by_xpath(".//a[@href]").get_attribute("href")
+            if "book-category" in category_url:
                 category = Category()
-                category.url = url
+                category.url = category_url
                 print(item.text)
                 category.title = item.text
                 categories.append(category)
         return categories
 
-    def __scrape_publishers_link(self):
-        publishers_url = "https://www.ketabrah.ir/page/publishers"
+    def __scrape_publishers_link(self, publishers_url):
         self.driver.get(publishers_url)
         publishers_list_element = self.driver.find_element_by_class_name("publishers-list")
         publisher_blocks_elements = publishers_list_element.find_elements_by_class_name("publisher-block")
