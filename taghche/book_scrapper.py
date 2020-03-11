@@ -1,4 +1,5 @@
-﻿import os
+﻿import logging
+import os
 import sys
 import json
 import ijson
@@ -46,13 +47,13 @@ class BookScrapper(object):
         return paginated_furl.url
 
     def __get_books_from_api(self, url):
-        print("api called")
+        logging.info("API Called")
         r = requests.get(url)
         r.encoding = 'UTF-8'
         self.__save_json_to_file(r.json(), JSON_FILE_PATH)
 
         with open(JSON_FILE_PATH, encoding='utf-8-sig') as input_file:
-            print("json file started")
+            logging.info('reading from json file')
             json_books = ijson.items(input_file, "bookList.books.item")
             books = []
             for book in json_books:
@@ -91,7 +92,7 @@ class BookScrapper(object):
         _custom_offset = offset.split('-')
         _custom_offset[-1] = str(length)
         _offset = '-'.join(_custom_offset)
-        print(_offset)
+        logging.info(offset)
         return _offset
 
     def __get_next_offset_from_json(self, ):
@@ -114,6 +115,7 @@ class BookScrapper(object):
             with open(file_name, 'w') as json_file:
                 json.dump(json_object, json_file)
         except Exception as error:
+            logging.error("JSON could not save")
             raise error
 
     @staticmethod

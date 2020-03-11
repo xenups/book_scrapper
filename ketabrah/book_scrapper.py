@@ -1,4 +1,6 @@
 ﻿# -*- coding: UTF-8 -*-
+import logging
+
 from bookcrawler.models.model import Book, Publisher, Category
 from selenium.webdriver.chrome.webdriver import WebDriver
 from bookcrawler.file_handler.csv_handler import export_book_to_csv
@@ -7,13 +9,16 @@ from bookcrawler.file_handler.csv_handler import export_book_to_csv
 class BookScrapper(object):
     def __init__(self, driver: WebDriver):
         self.driver = driver
+        logging.info("initializing finished")
 
     def extract_books_by_category(self, category_url):
+        logging.info("extract_books_by_category started")
         categories = self.__scrape_categories_link(category_url=category_url)
         for category in categories:
             export_book_to_csv(self.__scrape_books_by_category(category))
 
     def extract_books_by_publishers(self, publishers_url):
+        logging.info("extract_books_by_publisher started")
         publishers = self.__scrape_publishers_link(publishers_url=publishers_url)
         for publisher in publishers:
             export_book_to_csv(self.__scrape_books_by_publishers(publisher))
@@ -31,11 +36,11 @@ class BookScrapper(object):
                     for book in books_list_element:
                         book_instance = Book()
                         book_instance.title = book.find_element_by_class_name("title").text
+                        logging.info(book_instance.title)
                         book_instance.author = book.find_element_by_class_name("authors").text
                         book_instance.price = book.find_element_by_class_name("price").text
                         book_instance.category = category.title
                         list_books.append(book_instance)
-                        print(book_instance.title)
                 except Exception as e:
                     pass
                 page_index = page_index + 1
@@ -57,7 +62,7 @@ class BookScrapper(object):
             if "book-category" in category_url:
                 category = Category()
                 category.url = category_url
-                print(item.text)
+                logging.info(item.text)
                 category.title = item.text
                 categories.append(category)
         return categories
@@ -71,6 +76,7 @@ class BookScrapper(object):
             publisher = Publisher()
             publisher.url = publisher_block.get_attribute("href")
             publisher.name = publisher_block.find_element_by_class_name("publisher-block-name").text
+            logging.info(publisher.name)
             list_publishers.append(publisher)
         return list_publishers
 
@@ -87,11 +93,11 @@ class BookScrapper(object):
                     for book in books_list_element:
                         book_instance = Book()
                         book_instance.title = book.find_element_by_class_name("title").text
+                        logging.info(book_instance.title)
                         book_instance.author = book.find_element_by_class_name("authors").text
                         book_instance.price = book.find_element_by_class_name("price").text
                         book_instance.publisher = publisher.name
                         list_books.append(book_instance)
-                        print(book_instance.title)
                 except Exception as e:
                     pass
                 page_index = page_index + 1
