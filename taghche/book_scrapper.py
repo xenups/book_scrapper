@@ -1,19 +1,13 @@
-﻿import json
-import os
+﻿import os
 import sys
-import time
-from time import sleep
-
+import json
 import ijson
 import requests
 from furl import furl
 from urllib.parse import unquote
-
+from bookcrawler.models.model import Book, Pagination
 from bookcrawler.file_handler.csv_handler import export_book_to_csv
-from bookcrawler.models.model import Book
-from taghche.models.model import Pagination
 
-sys.setrecursionlimit(1000000000)
 JSON_FILE_PATH = "./taghche/data/taghche.json"
 TEMPLATE_URL = "https://get.taaghche.com/v2/everything?filters={%22list%22:[{%22value%22:31,%22type%22:1},{%22type%22:3,%22value%22:-106},{%22type%22:21,%22value%22:0},{%22type%22:50,%22value%22:0}],%22refId%22:%22ff27bfa7-2166-46bf-9b2f-221ab9f18e7d.1%22}&offset=0-0-0-15&order=7"
 HOST = "https://get.taaghche.com/v2/everything"
@@ -21,33 +15,31 @@ INITIAL_OFFSET = "0-0-0-100"
 
 
 class BookScrapper(object):
-    def __init__(self, category_id):
-        self.category_id = category_id
-
+    def __init__(self):
         self.__remove_json_file()
-        self.url = self.__generate_url_by_category(category_id=category_id, offset=INITIAL_OFFSET)
 
-    def extract_books_by_category(self):
-        export_book_to_csv(self.__get_books_from_api(self.url))
+    def extract_books_api_by_category(self, category_id):
         __pagination = self.__get_next_offset_from_json()
-
-        if __pagination.hasMore:
-            self.url = self.__generate_url_by_category(self.category_id, offset=__pagination.offset)
-            self.extract_books_by_category()
+        while True:
+            if __pagination.hasMore:
+                url = self.__generate_url_pagination_by_category(category_id, offset=__pagination.offset)
+                export_book_to_csv(self.__get_books_from_api(url=url))
+                __pagination = self.__get_next_offset_from_json()
+            else:
+                break
 
     @staticmethod
-    def __generate_url_by_category(category_id, offset):
+    def __generate_url_pagination_by_category(category_id, offset):
         unquote_url = furl(unquote(TEMPLATE_URL))
         filters = json.loads(unquote_url.query.params["filters"])
-        filters["list"][0]["value"] = category_id
+        filters["list"][0]["value"] = str(category_id)
         category_filter = json.dumps(filters)
-        url = furl(unquote(HOST)).add(args={'filters': category_filter, 'offset': offset})
-        return url
+        paginated_furl = furl(unquote(HOST)).add(args={'filters': category_filter, 'offset': offset})
+        return paginated_furl.url
 
     def __get_books_from_api(self, url):
         print("api called")
         r = requests.get(url)
-        print(url)
         r.encoding = 'UTF-8'
         self.__save_json_to_file(r.json(), JSON_FILE_PATH)
 
@@ -100,7 +92,7 @@ class BookScrapper(object):
                 json_object = json.load(input_file)
                 pagination = Pagination()
                 pagination.hasMore = json_object["hasMore"]
-                pagination.offset = self.change_offset_lentgh(json_object["nextOffset"], 1000)
+                pagination.offset = self.change_offset_lentgh(json_object["nextOffset"], 100)
                 return pagination
         except Exception as error:
             pagination = Pagination()
