@@ -29,6 +29,7 @@ class Book(object):
         self.physicalPrice = None
         self.rating = None
         self.publish_date = None
+        self.url = None
 
     def list_object(self):
         return self.remove_none_objects(

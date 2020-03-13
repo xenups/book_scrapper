@@ -1,11 +1,13 @@
 ﻿# -*- coding: UTF-8 -*-
 import logging
-import sys
 from unidecode import unidecode
 
 from bookcrawler.file_handler.csv_handler import export_book_to_csv
 from bookcrawler.models.model import Book, Publisher
 from selenium.webdriver.chrome.webdriver import WebDriver
+
+from bookcrawler.selenium_driver import SeleniumDriver
+from bookcrawler.util import background
 
 
 class BookScrapper(object):
@@ -17,7 +19,6 @@ class BookScrapper(object):
         for publisher in publishers:
             books = self.__scrape_books_by_publishers(publisher)
             export_book_to_csv(books=books)
-
     def __extract_publishers(self, publishers_url):
         self.driver.get(publishers_url)
         logging.info('extracting publishers started')
@@ -46,12 +47,27 @@ class BookScrapper(object):
             for book in books:
                 book_instance = Book()
                 book_instance.title = book.find_element_by_class_name("title").text
+                book_instance.url = book.find_element_by_xpath(".//a[@href]").get_attribute("href")
                 book_instance.author = book.find_element_by_class_name("author").text
                 book_instance.publisher = publisher.name
+                book_instance.price = self.__scrape_price_by_book_details(book_instance.url)
                 list_books.append(book_instance)
                 logging.info(book_instance.title)
             logging.info('extracting publishers finished')
         return list_books
+
+    @staticmethod
+    def __scrape_price_by_book_details(page_url):
+        try:
+            driver = SeleniumDriver.chrome_driver(without_browser=False)
+            driver.get(page_url)
+            section = driver.find_element_by_class_name("section-1")
+            container = section.find_element_by_class_name("container")
+            book_price = container.find_elements_by_class_name("book-price")
+            return book_price[1].text
+        except:
+            book_price = "0"
+        return book_price
 
     def __extract_pages_count(self, url):
         page_without_pagination_count = 1
