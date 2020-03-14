@@ -17,7 +17,7 @@ class Fidibo(BookStore):
     def scrape_by_publishers(self):
         driver = SeleniumDriver()
         url = "https://fidibo.com/books/publisher"
-        FidiboScrapper(driver=driver.chrome_driver(hide_image=True, without_browser=False)).extract_books_by_publishers(
+        FidiboScrapper(driver=driver.chrome_driver(optimized_mode=True, without_browser=False)).extract_books_by_publishers(
             publishers_url=url)
 
 

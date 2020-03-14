@@ -7,7 +7,7 @@ from bookcrawler.models.model import Book, Publisher
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 from bookcrawler.selenium_driver import SeleniumDriver
-from bookcrawler.util import background
+from bookcrawler.util import background, close_current_tab, open_new_tab
 
 
 class BookScrapper(object):
@@ -17,8 +17,12 @@ class BookScrapper(object):
     def extract_books_by_publishers(self, publishers_url):
         publishers = self.__extract_publishers(publishers_url)
         for publisher in publishers:
-            books = self.__scrape_books_by_publishers(publisher)
-            export_book_to_csv(books=books)
+            try:
+                books = self.__scrape_books_by_publishers(publisher)
+                export_book_to_csv(books=books)
+            except:
+                pass
+
     def __extract_publishers(self, publishers_url):
         self.driver.get(publishers_url)
         logging.info('extracting publishers started')
@@ -56,16 +60,18 @@ class BookScrapper(object):
             logging.info('extracting publishers finished')
         return list_books
 
-    @staticmethod
-    def __scrape_price_by_book_details(page_url):
+    def __scrape_price_by_book_details(self, page_url):
         try:
-            driver = SeleniumDriver.chrome_driver(without_browser=False)
-            driver.get(page_url)
-            section = driver.find_element_by_class_name("section-1")
+            open_new_tab(self.driver)
+            self.driver.get(page_url)
+            section = self.driver.find_element_by_class_name("section-1")
             container = section.find_element_by_class_name("container")
-            book_price = container.find_elements_by_class_name("book-price")
-            return book_price[1].text
-        except:
+            book_price = container.find_elements_by_class_name("book-price")[1].text
+            close_current_tab(self.driver)
+            return book_price
+        except Exception as error:
+            close_current_tab(self.driver)
+            print(error.args)
             book_price = "0"
         return book_price
 

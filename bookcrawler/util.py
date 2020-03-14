@@ -34,3 +34,13 @@ def initial_logs():
     root_logger.addHandler(file_handler)
     root_logger.setLevel(level=logging.INFO)
     # file_handler.setLevel(level=logging.ERROR)
+
+
+def open_new_tab(driver):
+    driver.execute_script("window.open()")
+    driver.switch_to.window(driver.window_handles[1])
+
+
+def close_current_tab(driver):
+    driver.execute_script("window.close()")
+    driver.switch_to.window(driver.window_handles[0])
