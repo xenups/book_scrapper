@@ -44,3 +44,13 @@ def open_new_tab(driver):
 def close_current_tab(driver):
     driver.execute_script("window.close()")
     driver.switch_to.window(driver.window_handles[0])
+
+
+def split(arr, size):
+    arrs = []
+    while len(arr) > size:
+        pice = arr[:size]
+        arrs.append(pice)
+        arr = arr[size:]
+    arrs.append(arr)
+    return arrs

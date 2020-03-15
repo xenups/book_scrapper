@@ -3,6 +3,7 @@ from bookcrawler.selenium_driver import SeleniumDriver
 from fidibo.book_scrapper import BookScrapper as FidiboScrapper
 from taghche.book_scrapper import BookScrapper as TaghcheScrapper
 from ketabrah.book_scrapper import BookScrapper as KetabrahScrapper
+from navar.book_scrapper import BookScrapper as NavarScrapper
 
 
 class BookStore(ABC):
@@ -17,7 +18,8 @@ class Fidibo(BookStore):
     def scrape_by_publishers(self):
         driver = SeleniumDriver()
         url = "https://fidibo.com/books/publisher"
-        FidiboScrapper(driver=driver.chrome_driver(optimized_mode=True, without_browser=False)).extract_books_by_publishers(
+        FidiboScrapper(
+            driver=driver.chrome_driver(optimized_mode=True, without_browser=True)).extract_books_by_publishers(
             publishers_url=url)
 
 
@@ -40,3 +42,9 @@ class Ketabrah(BookStore):
         driver = SeleniumDriver()
         KetabrahScrapper(driver=driver.chrome_driver(without_browser=False)).extract_books_by_category(
             category_url=category_url)
+
+
+class Navar(BookStore):
+    def scrape_by_category(self):
+        navar = NavarScrapper()
+        navar.extract_books_api_by_category(5)
