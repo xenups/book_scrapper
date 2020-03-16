@@ -7,27 +7,59 @@ from furl import furl
 from urllib.parse import unquote
 import xml.etree.ElementTree as ET
 from bookcrawler.models.model import Book, Pagination
+from selenium.webdriver.chrome.webdriver import WebDriver
 from bookcrawler.file_handler.csv_handler import export_book_to_csv
 
 JSON_FILE_PATH = "./navar/data/navar.json"
 TEMPLATE_URL = "https://www.navaar.ir/api/audiobooks/genre/3/?$inlinecount=allpages"
-HOST = "https://www.navaar.ir/api/audiobooks/genre/3/?$inlinecount=allpages"
+WEBSITE = "https://www.navaar.ir/catalog/genre/2/%D8%AF%D8%A7%D8%B3%D8%AA%D8%A7%D9%86-%D9%88-%D8%B1%D9%85%D8%A7%D9%86-%D8%AE%D8%A7%D8%B1%D8%AC%DB%8C"
 
 
 class BookScrapper(object):
+    def __init__(self, driver: WebDriver):
+        self.driver = driver
+
+    def __scrape_genres_urls(self):
+        self.driver.get(url=WEBSITE)
+        menu_items = self.driver.find_element_by_class_name("side-nav")
+        items = menu_items.find_elements_by_xpath(".//a[@href]")
+        _list_genres = []
+        for item in items:
+            if "genre" in item.get_attribute("href"):
+                _list_genres.append(item.get_attribute("href"))
+
+        _list_genres_without_duplication = list(set(_list_genres))
+
+        return _list_genres_without_duplication
+
+    def __extract_genres_id(self):
+        genre_urls = self.__scrape_genres_urls()
+        genres = []
+        for url in genre_urls:
+            unquote_url = furl(unquote(url))
+            "segment 2 belong to category"
+            genres.append(unquote_url.path.segments[2])
+        return genres
+
+    def extract_books(self):
+        genres_id = self.__extract_genres_id()
+        genres_id.sort()
+        for id in genres_id:
+            self.extract_books_api_by_category(id)
 
     def extract_books_api_by_category(self, category_id):
+
         category_url = self.__generate_category_url(category_id)
-        books = self.get_books_from_api(category_url)
+        books = self.__get_books_from_api(category_url)
         export_book_to_csv(books, file_name="navar")
 
-    def get_books_from_api(self, category_url):
+    def __get_books_from_api(self, category_url):
         logging.info("API CALLED")
         self.__remove_json_file()
         pagination = self.__get_next_offset_from_json()
         url = category_url
         logging.info(pagination.offset)
-        books = []
+        list_books = []
         while pagination.hasMore:
             response = requests.get(url)
             response.encoding = 'UTF-8'
@@ -35,30 +67,38 @@ class BookScrapper(object):
             self.__save_json_to_file(response.json(), JSON_FILE_PATH)
             pagination = self.__get_next_offset_from_json()
             url = pagination.offset
-            if pagination.offset == "null":
-                pagination.hasMore = False
-            with open(JSON_FILE_PATH, encoding='utf-8-sig') as input_file:
-                logging.info('reading from json file')
-                parser = ijson.parse(input_file)
-                for prefix, event, value in parser:
-                    if prefix == "items.item.title":
-                        book = Book()
-                        book.title = value
-                        logging.info(book.title)
-                    if prefix == "items.item.products.item.price":
-                        book.price = value
-                    if prefix == "items.item.audioPublisherTitle":
-                        book.publisher = value
-                        logging.info(book.publisher)
+            books = self.__extract_books_from_json()
+            list_books.extend(books)
+        return list_books
 
-                    if prefix == "items.item.authors.item.firstName":
-                        book.author = value
-                    if prefix == "items.item.authors.item.lastName":
-                        book.author = str(book.author) + " " + value
-                        books.append(book)
-        return books
+    def __extract_books_from_json(self):
+        with open(JSON_FILE_PATH, encoding='utf-8-sig') as input_file:
+            logging.info('reading from json file')
+            parser = ijson.parse(input_file)
+            books = []
+            __found_book = False
+            for prefix, event, value in parser:
+                if prefix == "items.item.title":
+                    __found_book = True
+                    book = Book()
+                    book.title = value
+                    logging.info(book.title)
+                if prefix == "items.item.products.item.price":
+                    book.price = value
+                if prefix == "items.item.authors.item.firstName":
+                    book.author = value
+                if prefix == "items.item.authors.item.lastName":
+                    book.author = str(book.author) + " " + value
+                if prefix == "items.item.audioPublisherTitle":
+                    book.publisher = value
+                if __found_book:
+                    __found_book = False
+                    books.append(book)
 
-    def convert_xml_to_json(self, response):
+            return books
+
+    @staticmethod
+    def __parse_xml(response):
         try:
 
             root_namespace = "{http://schemas.datacontract.org/2004/07/System.Web.Http.OData}"
@@ -83,13 +123,6 @@ class BookScrapper(object):
                 for author in authors:
                     book.author = author.find(item_namespace + "FirstName").text + " " + author.find(
                         item_namespace + "LastName").text
-
-                print(book.author)
-                print(book.price)
-                print(book.publisher)
-                print(book.title)
-
-
         except Exception as e:
             print(getattr(e, 'message', repr(e)))
 

@@ -46,5 +46,6 @@ class Ketabrah(BookStore):
 
 class Navar(BookStore):
     def scrape_by_category(self):
-        navar = NavarScrapper()
-        navar.extract_books_api_by_category(5)
+        driver = SeleniumDriver()
+        navar = NavarScrapper(driver=driver.chrome_driver(optimized_mode=False, without_browser=False))
+        navar.extract_books()

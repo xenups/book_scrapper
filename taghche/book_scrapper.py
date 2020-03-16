@@ -1,6 +1,5 @@
 ﻿import logging
 import os
-import sys
 import json
 import ijson
 import requests
@@ -28,7 +27,7 @@ class BookScrapper(object):
         while True:
             if __pagination.hasMore:
                 url = self.__generate_url_pagination_by_category(category_id, offset=__pagination.offset)
-                export_book_to_csv(self.__get_books_from_api(url=url))
+                export_book_to_csv(self.__get_books_from_api(url=url), file_name="taghche")
                 __pagination = self.__get_next_offset_from_json()
             else:
                 break
@@ -39,12 +38,12 @@ class BookScrapper(object):
 
     @staticmethod
     def __generate_url_pagination_by_category(category_id, offset):
-        unquote_url = furl(unquote(TEMPLATE_URL))
-        filters = json.loads(unquote_url.query.params["filters"])
-        filters["list"][0]["value"] = str(category_id)
-        category_filter = json.dumps(filters)
-        paginated_furl = furl(unquote(HOST)).add(args={'filters': category_filter, 'offset': offset})
-        return paginated_furl.url
+        _unquote_url = furl(unquote(TEMPLATE_URL))
+        _filters = json.loads(_unquote_url.query.params["filters"])
+        _filters["list"][0]["value"] = str(category_id)
+        _category_filter = json.dumps(_filters)
+        _paginated_furl = furl(unquote(HOST)).add(args={'filters': _category_filter, 'offset': offset})
+        return _paginated_furl.url
 
     def __get_books_from_api(self, url):
         logging.info("API Called")

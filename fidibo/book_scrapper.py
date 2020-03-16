@@ -19,7 +19,7 @@ class BookScrapper(object):
         for publisher in publishers:
             try:
                 books = self.__scrape_books_by_publishers(publisher)
-                export_book_to_csv(books=books)
+                export_book_to_csv(books=books, file_name="fidibo")
             except:
                 pass
 
@@ -42,11 +42,11 @@ class BookScrapper(object):
     def __scrape_books_by_publishers(self, publisher):
         pages_count = self.__extract_pages_count(url=publisher.url)
         list_books = []
-
+        driver = SeleniumDriver().chrome_driver(without_browser=False)
         for page_number in range(1, pages_count + 1):
             page_url = publisher.url + "?page=" + str(page_number)
-            self.driver.get(page_url)
-            books = self.driver.find_elements_by_class_name("book")
+            driver.get(page_url)
+            books = driver.find_elements_by_class_name("book")
             logging.info('extracting publishers started')
             for book in books:
                 book_instance = Book()
