@@ -54,3 +54,8 @@ def split(arr, size):
         arr = arr[size:]
     arrs.append(arr)
     return arrs
+
+
+def split_to_sublist(the_list, number_of_sublist):
+    k, m = divmod(len(the_list), number_of_sublist)
+    return (the_list[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(number_of_sublist))
