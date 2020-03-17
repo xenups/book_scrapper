@@ -16,11 +16,8 @@ class BookStore(ABC):
 
 class Fidibo(BookStore):
     def scrape_by_publishers(self):
-        driver = SeleniumDriver()
         url = "https://fidibo.com/books/publisher"
-        FidiboScrapper(
-            driver=driver.chrome_driver(optimized_mode=True, without_browser=True)).extract_books_by_publishers(
-            publishers_url=url)
+        FidiboScrapper().multi_book_extractor_by_publishers_url(publishers_url=url, number_of_extractor=2)
 
 
 class Taghche(BookStore):
