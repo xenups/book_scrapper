@@ -3,6 +3,13 @@ import sys
 import logging
 
 
+def convert_object_properties_to_list(_object):
+    _book_dictionary = _object.__dict__
+    _book_dictionary = clean_dict_none_terms(_book_dictionary)
+    _list_values = list(_book_dictionary.values())
+    return _list_values
+
+
 class Singleton(type):
     _instances = {}
 
@@ -34,6 +41,14 @@ def initial_logs():
     root_logger.addHandler(file_handler)
     root_logger.setLevel(level=logging.INFO)
     # file_handler.setLevel(level=logging.ERROR)
+
+
+def clean_dict_none_terms(d):
+    return {
+        k: v
+        for k, v in d.items()
+        if v is not None
+    }
 
 
 def open_new_tab(driver):
