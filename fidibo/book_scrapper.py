@@ -6,14 +6,15 @@ from unidecode import unidecode
 from bookcrawler.models.model import Book, Publisher
 from bookcrawler.selenium_driver import SeleniumDriver
 from selenium.webdriver.chrome.webdriver import WebDriver
-from bookcrawler.file_handler.csv_handler import export_book_to_csv
+from bookcrawler.file_handler.csv_handler import CSVHandler
 from bookcrawler.util import close_current_tab, open_new_tab, split_to_sublist
 
 
 class BookScrapper(object):
-    def __init__(self, without_browser=False, optimized_mode=True):
+    def __init__(self, without_browser=True, optimized_mode=True):
         self.without_browser = without_browser
         self.optimized_mode = optimized_mode
+        self.csv_handler = CSVHandler()
 
     def multi_book_extractor_by_publishers_url(self, publishers_url, number_of_extractor=2):
         thread = Thread()
@@ -33,7 +34,7 @@ class BookScrapper(object):
         for publisher in publishers:
             books = self.__scrape_books_by_publishers(publisher, driver)
             thread_indent = threading.get_ident()
-            export_book_to_csv(books=books, file_name="books " + str(thread_indent))
+            self.csv_handler.export_book_to_csv(books=books, file_name="books " + str(thread_indent))
 
     def __scrape_publishers(self, publishers_url):
         driver = SeleniumDriver().chrome_driver(without_browser=self.without_browser,

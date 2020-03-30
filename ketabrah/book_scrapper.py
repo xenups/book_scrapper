@@ -3,25 +3,27 @@ import logging
 
 from bookcrawler.models.model import Book, Publisher, Category
 from selenium.webdriver.chrome.webdriver import WebDriver
-from bookcrawler.file_handler.csv_handler import export_book_to_csv
+from bookcrawler.file_handler.csv_handler import CSVHandler
 
 
 class BookScrapper(object):
     def __init__(self, driver: WebDriver):
         self.driver = driver
         logging.info("initializing finished")
+        self.csv_handler = CSVHandler()
+
 
     def extract_books_by_category(self, category_url):
         logging.info("extract_books_by_category started")
         categories = self.__scrape_categories_link(category_url=category_url)
         for category in categories:
-            export_book_to_csv(self.__scrape_books_by_category(category), file_name="ketabrah")
+            self.csv_handler.export_book_to_csv(self.__scrape_books_by_category(category), file_name="ketabrah")
 
     def extract_books_by_publishers(self, publishers_url):
         logging.info("extract_books_by_publisher started")
         publishers = self.__scrape_publishers_link(publishers_url=publishers_url)
         for publisher in publishers:
-            export_book_to_csv(self.__scrape_books_by_publishers(publisher), file_name="ketabrah")
+            self.csv_handler.export_book_to_csv(self.__scrape_books_by_publishers(publisher), file_name="ketabrah")
 
     def __scrape_books_by_category(self, category):
         list_books = []

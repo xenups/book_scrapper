@@ -8,7 +8,7 @@ from urllib.parse import unquote
 import xml.etree.ElementTree as ET
 from bookcrawler.models.model import Book, Pagination
 from selenium.webdriver.chrome.webdriver import WebDriver
-from bookcrawler.file_handler.csv_handler import export_book_to_csv
+from bookcrawler.file_handler.csv_handler import CSVHandler
 
 JSON_FILE_PATH = "./navar/data/navar.json"
 TEMPLATE_URL = "https://www.navaar.ir/api/audiobooks/genre/3/?$inlinecount=allpages"
@@ -18,6 +18,7 @@ WEBSITE = "https://www.navaar.ir/catalog/genre/2/%D8%AF%D8%A7%D8%B3%D8%AA%D8%A7%
 class BookScrapper(object):
     def __init__(self, driver: WebDriver):
         self.driver = driver
+        self.csv_handler = CSVHandler()
 
     def __scrape_genres_urls(self):
         self.driver.get(url=WEBSITE)
@@ -29,7 +30,7 @@ class BookScrapper(object):
                 _list_genres.append(item.get_attribute("href"))
 
         _list_genres_without_duplication = list(set(_list_genres))
-
+        self.driver.close()
         return _list_genres_without_duplication
 
     def __extract_genres_id(self):
@@ -48,10 +49,9 @@ class BookScrapper(object):
             self.extract_books_api_by_category(id)
 
     def extract_books_api_by_category(self, category_id):
-
         category_url = self.__generate_category_url(category_id)
         books = self.__get_books_from_api(category_url)
-        export_book_to_csv(books, file_name="navar")
+        self.csv_handler.export_book_to_csv(books, file_name="navar")
 
     def __get_books_from_api(self, category_url):
         logging.info("API CALLED")
