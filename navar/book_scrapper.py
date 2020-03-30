@@ -82,6 +82,8 @@ class BookScrapper(object):
                     __found_book = True
                     book = Book()
                     book.title = value
+                    book.author = " "
+                    book.publisher = " "
                     logging.info(book.title)
                 if prefix == "items.item.products.item.price":
                     book.price = value
