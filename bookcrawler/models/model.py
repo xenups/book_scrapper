@@ -30,16 +30,3 @@ class Book(object):
         self.rating = None
         self.publish_date = None
         self.url = None
-
-    def list_object(self):
-        return self.remove_none_objects(
-            [self.title, self.author, self.publisher, self.price, self.category, self.page_number,
-             self.ISBN, self.beforeOffPrice, self.physicalPrice, self.rating, self.publish_date])
-
-    @staticmethod
-    def remove_none_objects(book_objects):
-        _book_objects = book_objects
-        for book_object in _book_objects:
-            if book_object is None:
-                _book_objects.remove(book_object)
-        return _book_objects
