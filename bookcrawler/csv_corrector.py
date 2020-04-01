@@ -5,6 +5,7 @@ import pandas as pd
 class CSVCorrectorAbstract(ABC):
     def __init__(self, file_path):
         self._data_frame = pd.read_csv(file_path, skipinitialspace=True)
+        self.file_path = file_path
 
     def drop_blank_columns(self):
         self._data_frame.dropna(how='all', axis=1, inplace=True)
@@ -31,7 +32,7 @@ class NavarCSVCorrector(CSVCorrectorAbstract):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
         self.clean_price()
-        self.export_to_csv("cleaned_navar.csv")
+        self.export_to_csv(self.file_path)
 
 
 class KetabrahCSVCorrector(CSVCorrectorAbstract):
@@ -39,14 +40,14 @@ class KetabrahCSVCorrector(CSVCorrectorAbstract):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
         self.clean_price()
-        self.export_to_csv("cleaned_ketabrah.csv")
+        self.export_to_csv(self.file_path)
 
 
 class TaghcheCSVCorrector(CSVCorrectorAbstract):
     def correct_data(self):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
-        self.export_to_csv("cleaned_taghche.csv")
+        self.export_to_csv(self.file_path)
 
 
 class FidiboCSVCorrector(CSVCorrectorAbstract):
@@ -55,4 +56,4 @@ class FidiboCSVCorrector(CSVCorrectorAbstract):
         self.drop_column("url")
         self.remove_duplicate_lines()
         self.clean_price()
-        self.export_to_csv("cleaned_fidibo.csv")
+        self.export_to_csv(self.file_path)
