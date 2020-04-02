@@ -25,13 +25,15 @@ class BookScrapper(object):
 
     def extract_books_api_by_category(self, category_id):
         __pagination = self.__get_next_offset_from_json()
+        out_put_file = ""
         while True:
             if __pagination.hasMore:
                 url = self.__generate_url_pagination_by_category(category_id, offset=__pagination.offset)
-                self.csv_handler.export_book_to_csv(file_name="taghche", books=self.__get_books_from_api(url=url))
+                out_put_file = self.csv_handler.export_book_to_csv(file_name="taghche",
+                                                                   books=self.__get_books_from_api(url=url))
                 __pagination = self.__get_next_offset_from_json()
             else:
-                break
+                return out_put_file
 
     def set_response_count(self, count: int):
         self.INITIAL_OFFSET = "0-0-0-" + str(count)

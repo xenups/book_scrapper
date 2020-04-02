@@ -27,6 +27,7 @@ class CSVHandler(object):
         for book in books:
             _csv_write.writerow(convert_object_properties_to_list(book))
             logging.info(book.title)
+        return file_name
 
     def join_csv_files(self, file_names, out_put="out_put.csv"):
         try:

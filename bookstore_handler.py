@@ -1,4 +1,8 @@
-﻿from abc import ABC
+﻿import subprocess
+from abc import ABC
+
+from bookcrawler.csv_corrector import FidiboCSVCorrector, TaghcheCSVCorrector, KetabrahCSVCorrector, NavarCSVCorrector
+from bookcrawler.csv_to_db import CSVToDB
 from bookcrawler.selenium_driver import SeleniumDriver
 from fidibo.book_scrapper import BookScrapper as FidiboScrapper
 from taghche.book_scrapper import BookScrapper as TaghcheScrapper
@@ -17,32 +21,37 @@ class BookStore(ABC):
 class Fidibo(BookStore):
     def scrape_by_publishers(self):
         url = "https://fidibo.com/books/publisher"
-        FidiboScrapper().multi_book_extractor_by_publishers_url(publishers_url=url, number_of_extractor=2)
+        fidibo_csv_file = FidiboScrapper(without_browser=False).multi_book_extractor_by_publishers_url(
+            publishers_url=url,
+            worker=2)
+        cleaned_data = FidiboCSVCorrector(fidibo_csv_file).correct_data()
 
 
 class Taghche(BookStore):
     def scrape_by_category(self):
         taghche = TaghcheScrapper()
         taghche.set_response_count(150)
-        taghche.extract_books_api_by_category(category_id=1)
+        taghche_csv_path = taghche.extract_books_api_by_category(category_id=1)
+        cleaned_data = TaghcheCSVCorrector(taghche_csv_path).correct_data()
 
 
 class Ketabrah(BookStore):
     def scrape_by_publishers(self):
         publishers_url = "https://www.ketabrah.ir/page/publishers"
         driver = SeleniumDriver()
-        KetabrahScrapper(driver=driver.chrome_driver(without_browser=False)).extract_books_by_publishers(
+        csv_path = KetabrahScrapper(without_browser=False, optimized_mode=True).extract_books_by_publishers(
             publishers_url=publishers_url)
+        cleaned_data = KetabrahCSVCorrector(csv_path).correct_data()
 
     def scrape_by_category(self):
         category_url = "https://www.ketabrah.ir/book-category/%DA%A9%D8%AA%D8%A7%D8%A8%E2%80%8C%D9%87%D8%A7%DB%8C-%D8%AD%D9%82%D9%88%D9%82/"
-        driver = SeleniumDriver()
-        KetabrahScrapper(driver=driver.chrome_driver(without_browser=False)).extract_books_by_category(
+        csv_path = KetabrahScrapper(without_browser=False, optimized_mode=True).extract_books_by_category(
             category_url=category_url)
+        cleaned_data = KetabrahCSVCorrector(csv_path).correct_data()
 
 
 class Navar(BookStore):
     def scrape_by_category(self):
-        driver = SeleniumDriver()
-        navar = NavarScrapper(driver=driver.chrome_driver(optimized_mode=False, without_browser=False))
-        navar.extract_books()
+        navar = NavarScrapper(optimized_mode=False, without_browser=False)
+        csv_path = navar.extract_books()
+        cleaned_data = NavarCSVCorrector(csv_path).correct_data()

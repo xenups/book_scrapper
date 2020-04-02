@@ -17,18 +17,18 @@ class BookScrapper(object):
         self._workers_output_files = []
         self.output_file = output_file
 
-    def multi_book_extractor_by_publishers_url(self, publishers_url, number_of_worker=2):
+    def multi_book_extractor_by_publishers_url(self, publishers_url, worker=2):
         """its creating multi thread  extractor and then call _extract_books_by_publishers then aggregate the results
         Parameters
         ----------
         publishers_url : str
             url of publisher link
-        number_of_worker: int
+        worker: int
             number of thread that selenium will run
         """
         thread = Thread()
         _publishers = self._scrape_publishers(publishers_url)
-        _split_publishers_list = split_to_sublist(the_list=_publishers, number_of_sublist=number_of_worker)
+        _split_publishers_list = split_to_sublist(the_list=_publishers, number_of_sublist=worker)
 
         for publishers in _split_publishers_list:
             thread = Thread(target=self._extract_books_by_publishers, args=(publishers,))
