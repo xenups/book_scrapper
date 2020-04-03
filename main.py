@@ -1,11 +1,11 @@
-from bookcrawler.util import initial_logs, split_to_sublist
+from bookcrawler.util import initialize_logs
 from bookstore_handler import Fidibo, Taghche, Ketabrah, Navar
 
 if __name__ == '__main__':
-    initial_logs()
-
-    Fidibo().scrape_by_publishers()
-    # Taghche().scrape_by_category()
-    # Ketabrah().scrape_by_publishers()
-    # Navar().scrape_by_category()
-
+    initialize_logs()
+    Fidibo().crawl_by_publishers()
+    # Taghche().crawl_by_publishers()
+    # Taghche().crawl_by_category()
+    # Ketabrah().crawl_by_category()
+    # Ketabrah().crawl_by_publishers()
+    # Navar().crawl_by_category()
