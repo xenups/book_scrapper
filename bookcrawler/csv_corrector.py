@@ -1,4 +1,4 @@
-﻿from abc import ABC
+﻿from abc import ABC, abstractmethod
 import pandas as pd
 
 
@@ -23,37 +23,48 @@ class CSVCorrectorAbstract(ABC):
     def export_to_csv(self, file_name="output"):
         self._data_frame.to_csv(file_name, index=False, encoding='utf-8')
 
+    @abstractmethod
     def correct_data(self):
         pass
 
 
-class NavarCSVCorrector(CSVCorrectorAbstract):
+class NavarCorrector(CSVCorrectorAbstract):
     def correct_data(self):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
         self.clean_price()
         self.export_to_csv(self.file_path)
+        return self.file_path
 
 
-class KetabrahCSVCorrector(CSVCorrectorAbstract):
+class KetabrahCorrector(CSVCorrectorAbstract):
     def correct_data(self):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
         self.clean_price()
         self.export_to_csv(self.file_path)
+        return self.file_path
 
 
-class TaghcheCSVCorrector(CSVCorrectorAbstract):
+class TaghcheCorrector(CSVCorrectorAbstract):
     def correct_data(self):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
         self.export_to_csv(self.file_path)
+        return self.file_path
 
 
-class FidiboCSVCorrector(CSVCorrectorAbstract):
+class FidiboCorrector(CSVCorrectorAbstract):
     def correct_data(self):
         self.drop_blank_columns()
         self.drop_column("url")
         self.remove_duplicate_lines()
         self.clean_price()
         self.export_to_csv(self.file_path)
+        return self.file_path
+
+
+class CSVCorrectorFactory(object):
+    @classmethod
+    def correct_data(cls, designation, file_path):
+        return eval(designation)(file_path).correct_data()
