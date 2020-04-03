@@ -1,5 +1,4 @@
 import asyncio
-import sys
 import logging
 
 
@@ -26,7 +25,7 @@ def background(f):
     return wrapped
 
 
-def initial_logs():
+def initialize_logs():
     # logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
     log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
     root_logger = logging.getLogger()
