@@ -22,6 +22,7 @@ class CSVCorrectorAbstract(ABC):
 
     def export_to_csv(self, file_name="output"):
         self._data_frame.to_csv(file_name, index=False, encoding='utf-8')
+        return file_name
 
     @abstractmethod
     def correct_data(self):
@@ -33,8 +34,8 @@ class NavarCorrector(CSVCorrectorAbstract):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
         self.clean_price()
-        self.export_to_csv(self.file_path)
-        return self.file_path
+        file_path = self.export_to_csv(self.file_path)
+        return file_path
 
 
 class KetabrahCorrector(CSVCorrectorAbstract):
@@ -42,16 +43,16 @@ class KetabrahCorrector(CSVCorrectorAbstract):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
         self.clean_price()
-        self.export_to_csv(self.file_path)
-        return self.file_path
+        file_path = self.export_to_csv(self.file_path)
+        return file_path
 
 
 class TaghcheCorrector(CSVCorrectorAbstract):
     def correct_data(self):
         self.drop_blank_columns()
         self.remove_duplicate_lines()
-        self.export_to_csv(self.file_path)
-        return self.file_path
+        file_path = self.export_to_csv(self.file_path)
+        return file_path
 
 
 class FidiboCorrector(CSVCorrectorAbstract):
@@ -60,8 +61,8 @@ class FidiboCorrector(CSVCorrectorAbstract):
         self.drop_column("url")
         self.remove_duplicate_lines()
         self.clean_price()
-        self.export_to_csv(self.file_path)
-        return self.file_path
+        file_path = self.export_to_csv(self.file_path)
+        return file_path
 
 
 class CSVCorrectorFactory(object):
