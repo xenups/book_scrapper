@@ -1,9 +1,11 @@
-﻿from abc import ABC
+﻿import logging
+from abc import ABC
 from bookcrawler.csv_corrector import CSVCorrectorFactory
+from bookcrawler.csv_to_db import CSVToDB
+from navar.book_scrapper import BookScrapper as NavarScrapper
 from fidibo.book_scrapper import BookScrapper as FidiboScrapper
 from taghche.book_scrapper import BookScrapper as TaghcheScrapper
 from ketabrah.book_scrapper import BookScrapper as KetabrahScrapper
-from navar.book_scrapper import BookScrapper as NavarScrapper
 
 
 class BookStore(ABC):
@@ -17,10 +19,14 @@ class BookStore(ABC):
 class Fidibo(BookStore):
     def crawl_by_publishers(self):
         url = "https://fidibo.com/books/publisher"
+        logging.info("Crawling started")
         csv_path = FidiboScrapper(without_browser=False).multi_book_extractor_by_publishers_url(
             publishers_url=url,
             worker=2)
+        logging.info("Cleaning data's started")
         cleaned_data = CSVCorrectorFactory().correct_data("FidiboCorrector", csv_path)
+        CSVToDB(csv_input=cleaned_data, table_name="fidibo_test").convert_to_postgres()
+        logging.info("Task successfully finished ...")
 
 
 class Taghche(BookStore):
@@ -37,6 +43,7 @@ class Ketabrah(BookStore):
         csv_path = KetabrahScrapper(without_browser=False, optimized_mode=True).extract_books_by_publishers(
             publishers_url=publishers_url)
         cleaned_data = CSVCorrectorFactory().correct_data("KetabrahCorrector", csv_path)
+        CSVToDB(csv_input=cleaned_data,table_name="ketabrah")
 
     def crawl_by_category(self):
         category_url = "https://www.ketabrah.ir/book-category/%DA%A9%D8%AA%D8%A7%D8%A8%E2%80%8C%D9%87%D8%A7%DB%8C-%D8%AD%D9%82%D9%88%D9%82/"
