@@ -9,15 +9,18 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from bookcrawler.file_handler.csv_handler import CSVHandler
 from bookcrawler.util import close_current_tab, open_new_tab, split_to_sublist
 
+PUBLISHERS_URL = "https://fidibo.com/books/publisher"
+
 
 class BookScrapper(object):
     def __init__(self, without_browser=True, optimized_mode=True, output_file="fidibo.csv"):
+        logging.info("Crawling started")
         self.without_browser = without_browser
         self.optimized_mode = optimized_mode
         self._workers_output_files = []
         self.output_file = output_file
 
-    def multi_book_extractor_by_publishers_url(self, publishers_url, worker=2):
+    def multi_book_extractor_by_publishers_url(self, worker=2):
         """its creating multi thread  extractor and then call _extract_books_by_publishers then aggregate the results
         Parameters
         ----------
@@ -27,8 +30,8 @@ class BookScrapper(object):
             number of thread that selenium will run
         """
         thread = Thread()
-        _publishers = self._scrape_publishers(publishers_url)
-        _split_publishers_list = split_to_sublist(the_list=_publishers, number_of_sublist=worker)
+        _publishers = self._scrape_publishers(PUBLISHERS_URL)
+        _split_publishers_list = split_to_sublist(the_list=_publishers[-2:], number_of_sublist=worker)
 
         for publishers in _split_publishers_list:
             thread = Thread(target=self._extract_books_by_publishers, args=(publishers,))
