@@ -1,9 +1,11 @@
-﻿from abc import ABC, abstractmethod
+﻿import logging
+from abc import ABC, abstractmethod
 import pandas as pd
 
 
 class CSVCorrectorAbstract(ABC):
     def __init__(self, file_path):
+        logging.info("Cleaning data's started")
         self._data_frame = pd.read_csv(file_path, skipinitialspace=True)
         self.file_path = file_path
 
