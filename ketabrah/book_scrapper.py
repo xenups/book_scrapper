@@ -6,6 +6,9 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from bookcrawler.file_handler.csv_handler import CSVHandler
 from bookcrawler.selenium_driver import SeleniumDriver
 
+CATEGORY_URL = "https://www.ketabrah.ir/book-category/%DA%A9%D8%AA%D8%A7%D8%A8%E2%80%8C%D9%87%D8%A7%DB%8C-%D8%AD%D9%82%D9%88%D9%82/"
+PUBLISHERS_URL = "https://www.ketabrah.ir/page/publishers"
+
 
 class BookScrapper(object):
     def __init__(self, without_browser=False, optimized_mode=True):
@@ -13,18 +16,18 @@ class BookScrapper(object):
         logging.info("initializing finished")
         self.csv_handler = CSVHandler()
 
-    def extract_books_by_category(self, category_url):
+    def extract_books_by_category(self):
         logging.info("extract_books_by_category started")
-        categories = self.__scrape_categories_link(category_url=category_url)
+        categories = self.__scrape_categories_link(category_url=CATEGORY_URL)
         out_put_file = ""
         for category in categories:
             out_put_file = self.csv_handler.export_book_to_csv(self.__scrape_books_by_category(category),
                                                                file_name="ketabrah")
         return out_put_file
 
-    def extract_books_by_publishers(self, publishers_url):
+    def extract_books_by_publishers(self):
         logging.info("extract_books_by_publisher started")
-        publishers = self.__scrape_publishers_link(publishers_url=publishers_url)
+        publishers = self.__scrape_publishers_link(publishers_url=PUBLISHERS_URL)
         out_put_file = ""
 
         for publisher in publishers:
