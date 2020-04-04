@@ -14,3 +14,5 @@ database = {
 fidibo_worker = os.getenv('fidibo_worker') or 2
 
 taghche_response_count = os.getenv('taghche_response_count') or 150
+
+display_visibility = os.getenv("display_visibility") or 0
