@@ -1,12 +1,13 @@
-﻿import sqlite3
+﻿import logging
+import sqlite3
 import pandas as pd
-from sqlalchemy import create_engine
-
 from settings import database
+from sqlalchemy import create_engine
 
 
 class CSVToDB(object):
     def __init__(self, csv_input, table_name):
+        logging.info("Converting CSV To Database ...")
         self._db_name = database["db_name"]
         self._db_user = database["db_user"]
         self._db_pass = database["db_pass"]
@@ -23,6 +24,7 @@ class CSVToDB(object):
             df = pd.read_csv(self._csv_input)
             df.to_sql(self._table_name, _engine, if_exists="replace")
         except Exception as e:
+            logging.error("Database  error")
             raise e
 
     def convert_to_sqlite(self, ):
