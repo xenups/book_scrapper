@@ -1,4 +1,5 @@
 # BookStore Crawler
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
 
 This project is responsible for the crawling book stores. The coordinator, crawler, and CLI modules work together to do the actual crawling.
 
