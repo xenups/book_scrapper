@@ -10,3 +10,7 @@ database = {
     'db_port': os.getenv('db_port'),
     'db_name': os.getenv('db_name')
 }
+
+fidibo_worker = os.getenv('fidibo_worker') or 2
+
+taghche_response_count = os.getenv('taghche_response_count') or 150
