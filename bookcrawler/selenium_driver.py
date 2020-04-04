@@ -1,5 +1,6 @@
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 class SeleniumDriver:
@@ -8,7 +9,9 @@ class SeleniumDriver:
         chrome_options = webdriver.ChromeOptions()
 
         if without_browser:
-            chrome_options.add_argument('headless')
+            chrome_options.add_argument('--headless')
+            chrome_options.add_argument('--no-sandbox')
+            chrome_options.add_argument("--disable-setuid-sandbox")
         if optimized_mode:
             prefs = {"profile.managed_default_content_settings.images": 2,
                      "profile.default_content_setting_values.notifications": 2,
@@ -22,5 +25,7 @@ class SeleniumDriver:
                      }
 
             chrome_options.add_experimental_option("prefs", prefs)
-        web_driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
-        return web_driver
+            web_driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
+            # web_driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub", DesiredCapabilities.CHROME)
+
+            return web_driver
