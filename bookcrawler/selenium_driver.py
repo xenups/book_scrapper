@@ -12,6 +12,7 @@ class SeleniumDriver:
             chrome_options.add_argument('--headless')
             chrome_options.add_argument('--no-sandbox')
             chrome_options.add_argument("--disable-setuid-sandbox")
+            chrome_options.add_argument("--disable-dev-shm-usage")
         if optimized_mode:
             prefs = {"profile.managed_default_content_settings.images": 2,
                      "profile.default_content_setting_values.notifications": 2,
