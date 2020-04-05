@@ -1,12 +1,23 @@
 version: '3'
 
 services:
-#  selenium:
-#    image: selenium/standalone-chrome
-#    ports:
-#      - 4444:4444
+  #  selenium:
+  #    image: selenium/standalone-chrome
+  #    ports:
+  #      - 4444:4444
+    db:
+      image: postgres
+      restart: always
+      environment:
+        - POSTGRES_DB=test
+        - POSTGRES_USER=xenups
+        - POSTGRES_PASSWORD=123456
+      ports:
+        - "5432:5432"
   crawler:
     build: .
+    env_file: .env
+    container_name: "bookstores_crawler"
     command: bash -c "python3 main.py"
     volumes:
       - .:/bookcrawler  # <--  THIS line enables hot code reloading!
