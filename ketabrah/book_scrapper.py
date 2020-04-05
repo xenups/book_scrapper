@@ -29,9 +29,11 @@ class BookScrapper(object):
         logging.info("extract_books_by_publisher started")
         publishers = self.__scrape_publishers_link(publishers_url=PUBLISHERS_URL)
         out_put_file = ""
-
+        # for test
+        # publishers = publishers[-2:]
         for publisher in publishers:
-            self.csv_handler.export_book_to_csv(self.__scrape_books_by_publishers(publisher), file_name="ketabrah")
+            out_put_file = self.csv_handler.export_book_to_csv(self.__scrape_books_by_publishers(publisher),
+                                                               file_name="ketabrah")
         return out_put_file
 
     def __scrape_books_by_category(self, category):
