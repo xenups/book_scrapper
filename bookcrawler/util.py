@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import glob, os.path
 
 
 def convert_object_properties_to_list(_object):
@@ -23,6 +24,16 @@ def background(f):
         return asyncio.get_event_loop().run_in_executor(None, f, *args, **kwargs)
 
     return wrapped
+
+
+def clean_csv_files():
+    try:
+        file_list = glob.glob(os.path.join("*.csv"))
+        for file in file_list:
+            os.remove(file)
+            logging.info(file + " removed")
+    except Exception as e:
+        logging.error("Cannot clear root...")
 
 
 def initialize_logs():
