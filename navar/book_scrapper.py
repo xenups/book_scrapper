@@ -16,13 +16,16 @@ WEBSITE = "https://www.navaar.ir/catalog/genre/2/%D8%AF%D8%A7%D8%B3%D8%AA%D8%A7%
 
 
 class BookScrapper(object):
-    def __init__(self, without_browser=False, optimized_mode=True):
-        self.driver = SeleniumDriver().chrome_driver(without_browser=without_browser, optimized_mode=optimized_mode)
+    def __init__(self, without_browser=True, optimized_mode=True):
+        self.without_browser = without_browser
+        self.optimized_mode = optimized_mode
         self.csv_handler = CSVHandler()
 
     def __scrape_genres_urls(self):
-        self.driver.get(url=WEBSITE)
-        menu_items = self.driver.find_element_by_class_name("side-nav")
+        driver = SeleniumDriver().chrome_driver(without_browser=self.without_browser,
+                                                optimized_mode=self.optimized_mode)
+        driver.get(url=WEBSITE)
+        menu_items = driver.find_element_by_class_name("side-nav")
         items = menu_items.find_elements_by_xpath(".//a[@href]")
         _list_genres = []
         for item in items:
@@ -30,7 +33,7 @@ class BookScrapper(object):
                 _list_genres.append(item.get_attribute("href"))
 
         _list_genres_without_duplication = list(set(_list_genres))
-        self.driver.close()
+        driver.close()
         return _list_genres_without_duplication
 
     def __extract_genres_id(self):
@@ -46,6 +49,8 @@ class BookScrapper(object):
         genres_id = self.__extract_genres_id()
         genres_id.sort()
         out_put = ""
+        # for test
+        # genres_id = genres_id[-1:]
         for id in genres_id:
             out_put = self.extract_books_api_by_category(id)
         return out_put
