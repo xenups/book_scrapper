@@ -1,7 +1,6 @@
 ﻿# -*- coding: UTF-8 -*-
 import logging
-import threading
-from threading import Thread
+from multiprocessing import Process
 from unidecode import unidecode
 from bookcrawler.models.model import Book, Publisher
 from bookcrawler.selenium_driver import SeleniumDriver
@@ -17,7 +16,6 @@ class BookScrapper(object):
         logging.info("Crawling started")
         self.without_browser = without_browser
         self.optimized_mode = optimized_mode
-        self._workers_output_files = []
         self.output_file = output_file
 
     def multi_book_extractor_by_publishers_url(self, worker=2):
@@ -29,20 +27,25 @@ class BookScrapper(object):
         worker: int
             number of thread that selenium will run
         """
-        thread = Thread()
+        process = Process()
         _publishers = self._scrape_publishers(PUBLISHERS_URL)
-        _split_publishers_list = split_to_sublist(the_list=_publishers[-2:], number_of_sublist=worker)
-
+        # _split_publishers_list = split_to_sublist(the_list=_publishers[-2:], number_of_sublist=worker)
+        _split_publishers_list = split_to_sublist(the_list=_publishers, number_of_sublist=worker)
+        worker_files = []
         for publishers in _split_publishers_list:
-            thread = Thread(target=self._extract_books_by_publishers, args=(publishers,))
-            thread.start()
-        thread.join()
+            worker_files.append(process.name + ".csv")
+            process = Process(target=self._extract_books_by_publishers, args=(publishers, process.name))
+            process.start()
+        process.join()
+
         csv_handler = CSVHandler()
-        joined_file_path = csv_handler.join_csv_files(self._workers_output_files, out_put=self.output_file)
-        csv_handler.remove_files(self._workers_output_files)
+        joined_file_path = csv_handler.join_csv_files(worker_files, out_put=self.output_file)
+        csv_handler.remove_files(worker_files)
+        process.terminate()
+
         return joined_file_path
 
-    def _extract_books_by_publishers(self, publishers):
+    def _extract_books_by_publishers(self, publishers, file_name):
         """extract books by publishers , turn the_scrape_books_by_publishers into a csv file
         Parameters
         ----------
@@ -51,9 +54,6 @@ class BookScrapper(object):
         """
         driver = SeleniumDriver().chrome_driver(without_browser=self.without_browser,
                                                 optimized_mode=self.optimized_mode)
-        thread_name = threading.current_thread().getName()
-        file_name = "fidibo" + str(thread_name)
-        self._workers_output_files.append(file_name + ".csv")
         csv_handler = CSVHandler()
         for publisher in publishers:
             books = self._scrape_books_by_publishers(publisher, driver)
