@@ -5,15 +5,15 @@ services:
   #    image: selenium/standalone-chrome
   #    ports:
   #      - 4444:4444
-    db:
-      image: postgres
-      restart: always
-      environment:
-        - POSTGRES_DB=test
-        - POSTGRES_USER=xenups
-        - POSTGRES_PASSWORD=123456
-      ports:
-        - "5432:5432"
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=xenups
+      - POSTGRES_PASSWORD=123456
+    ports:
+      - "5432:5432"
   crawler:
     build: .
     env_file: .env
