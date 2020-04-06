@@ -22,7 +22,7 @@ In order to get started be sure to clone this project onto your Docker Host. Cre
 Once you've cloned the project to your host we can now start the Crawler project. 
 Easy! Navigate to the directory in which you cloned the project.
 Copy and rename .env.example to .env and change the variable as project needs.
-#####Or you can add the parameters manually into .env  file:
+Or you can add the parameters manually into .env  file:
 To generate an .env file these values are required:
 
 | Variable Name                     | Description                    |
