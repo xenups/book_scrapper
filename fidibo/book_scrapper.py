@@ -52,13 +52,16 @@ class BookScrapper(object):
         publishers:list
             its a list of publishers url
         """
-        driver = SeleniumDriver().chrome_driver(without_browser=self.without_browser,
-                                                optimized_mode=self.optimized_mode)
-        csv_handler = CSVHandler()
-        for publisher in publishers:
-            books = self._scrape_books_by_publishers(publisher, driver)
-            csv_handler.export_book_to_csv(books=books, file_name=file_name)
-        driver.close()
+        try:
+            driver = SeleniumDriver().chrome_driver(without_browser=self.without_browser,
+                                                    optimized_mode=self.optimized_mode)
+            csv_handler = CSVHandler()
+            for publisher in publishers:
+                books = self._scrape_books_by_publishers(publisher, driver)
+                csv_handler.export_book_to_csv(books=books, file_name=file_name)
+            driver.close()
+        except Exception as e:
+            logging.error(e)
 
     def _scrape_publishers(self, publishers_url):
         driver = SeleniumDriver().chrome_driver(without_browser=self.without_browser,
