@@ -1,6 +1,6 @@
-import asyncio
 import logging
 import glob, os.path
+from pubsub import pub
 
 
 def convert_object_properties_to_list(_object):
@@ -19,11 +19,13 @@ class Singleton(type):
         return cls._instances[cls]
 
 
-def background(f):
-    def wrapped(*args, **kwargs):
-        return asyncio.get_event_loop().run_in_executor(None, f, *args, **kwargs)
+class WebLogHandler(logging.StreamHandler):
+    def __init__(self):
+        logging.StreamHandler.__init__(self)
 
-    return wrapped
+    def emit(self, record):
+        msg = self.format(record)
+        pub.sendMessage('server_status', message=msg)
 
 
 def clean_csv_files():
@@ -42,14 +44,17 @@ def initialize_logs():
     root_logger = logging.getLogger()
 
     console_handler = logging.StreamHandler()
+    web_handler = WebLogHandler()
     console_handler.setFormatter(log_formatter)
     root_logger.addHandler(console_handler)
+    root_logger.addHandler(web_handler)
 
     file_handler = logging.FileHandler(filename='mylog.log', mode='a')
     file_handler.setLevel(level=logging.ERROR)
     file_handler.setFormatter(log_formatter)
     root_logger.addHandler(file_handler)
     root_logger.setLevel(level=logging.INFO)
+
     # file_handler.setLevel(level=logging.ERROR)
 
 
