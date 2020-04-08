@@ -1,9 +1,10 @@
 ﻿import logging
 from abc import ABC
+from pubsub import pub
 from pyvirtualdisplay import Display
 from bookcrawler.csv_to_db import CSVToDB
-from bookcrawler.csv_corrector import CSVCorrectorFactory
 from bookcrawler.util import clean_csv_files
+from bookcrawler.csv_corrector import CSVCorrectorFactory
 from navar.book_scrapper import BookScrapper as NavarScrapper
 from fidibo.book_scrapper import BookScrapper as FidiboScrapper
 from taghche.book_scrapper import BookScrapper as TaghcheScrapper
@@ -13,6 +14,7 @@ from settings import fidibo_worker, taghche_response_count, display_visibility
 
 class BookStore(ABC):
     def __init__(self):
+        pub.sendMessage('server_status', message=self.__class__.__name__ + " Started")
         clean_csv_files()
 
     def crawl_by_publishers(self):
@@ -20,6 +22,9 @@ class BookStore(ABC):
 
     def crawl_by_category(self):
         pass
+
+    def __del__(self):
+        pub.sendMessage('server_status', message=self.__class__.__name__ + " Finished")
 
 
 class Fidibo(BookStore):
