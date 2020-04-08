@@ -2,7 +2,6 @@
 import logging
 
 from bookcrawler.models.model import Book, Publisher, Category
-from selenium.webdriver.chrome.webdriver import WebDriver
 from bookcrawler.file_handler.csv_handler import CSVHandler
 from bookcrawler.selenium_driver import SeleniumDriver
 
