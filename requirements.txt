@@ -23,7 +23,7 @@ idna==2.9
 ijson==2.6.1
 importlib-metadata==1.6.0
 jsonschema==3.2.0
-lxml==4.5.0
+lxml==4.6.3
 numpy==1.18.2
 orderedmultidict==1.0.1
 pandas==1.0.3
