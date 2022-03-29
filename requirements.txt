@@ -27,7 +27,7 @@ lxml==4.5.0
 numpy==1.18.2
 orderedmultidict==1.0.1
 pandas==1.0.3
-paramiko==2.7.1
+paramiko==2.10.1
 psycopg2==2.8.4
 py-lru-cache==0.1.4
 pycparser==2.20
